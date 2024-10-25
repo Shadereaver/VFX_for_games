@@ -3,12 +3,14 @@
 #include "CoreMinimal.h"
 #include "Inputable.h"
 #include "GameFramework/Character.h"
+#include "NiagaraComponent.h"
 #include "PlayerCharacter.generated.h"
 
+class UPositionSwapAbility;
 class USpringArmComponent;
 class UCameraComponent;
 
-UCLASS()
+UCLASS(Abstract)
 class VFX_FOR_GAMES_API APlayerCharacter : public ACharacter, public IInputable
 {
 
@@ -38,4 +40,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UInputMappingContext> _InputMapping;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UNiagaraComponent> _Ring;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UNiagaraComponent> _Lightning;
 };

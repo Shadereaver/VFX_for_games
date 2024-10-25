@@ -7,7 +7,7 @@
 class UInputAction;
 struct FInputActionValue;
 
-UCLASS()
+UCLASS(Abstract)
 class VFX_FOR_GAMES_API AMainControl : public APlayerController
 {
 	GENERATED_BODY()

@@ -16,9 +16,9 @@ void AMainControl::SetupInputComponent()
 		EIP->BindAction(_JumpAction, ETriggerEvent::Completed, this, &AMainControl::JumpReleased);
 		EIP->BindAction(_AttackAction, ETriggerEvent::Started, this, &AMainControl::AttackPressed);
 		EIP->BindAction(_AttackAction, ETriggerEvent::Completed, this, &AMainControl::AttackReleased);
-		EIP->BindAction(_Ability1Action, ETriggerEvent::Triggered, this, &AMainControl::Ability1);
-		EIP->BindAction(_Ability2Action, ETriggerEvent::Triggered, this, &AMainControl::Ability2);
-		EIP->BindAction(_Ability3Action, ETriggerEvent::Triggered, this, &AMainControl::Ability3);
+		EIP->BindAction(_Ability1Action, ETriggerEvent::Started, this, &AMainControl::Ability1);
+		EIP->BindAction(_Ability2Action, ETriggerEvent::Started, this, &AMainControl::Ability2);
+		EIP->BindAction(_Ability3Action, ETriggerEvent::Started, this, &AMainControl::Ability3);
 	}
 }
 
