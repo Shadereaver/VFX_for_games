@@ -11,12 +11,6 @@ APlayerCharacter::APlayerCharacter()
 
 	_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camer"));
 	_Camera->SetupAttachment(_Arm, FName("SpringEndpoint"));
-
-	_Ring = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Ring"));
-	_Ring->SetupAttachment(RootComponent);
-	
-	_Lightning = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Lightning"));
-	_Lightning->SetupAttachment(RootComponent);
 }
 
 UInputMappingContext* APlayerCharacter::GetMappingContext_Implementation()
@@ -46,9 +40,7 @@ void APlayerCharacter::Input_Ability2_Implementation()
 
 void APlayerCharacter::Input_Ability3_Implementation()
 {
-	UE_LOG(LogTemp, Display, TEXT("HI"))
-	_Ring->ToggleActive();
-	_Lightning->ToggleActive();
+
 }
 
 void APlayerCharacter::Input_JumpPressed_Implementation()
@@ -63,8 +55,8 @@ void APlayerCharacter::Input_JumpReleased_Implementation()
 
 void APlayerCharacter::Input_Look_Implementation(FVector2D Value)
 {
-	AddActorWorldRotation(FRotator(0.f, Value.X, 0.f));
-	_Arm->AddLocalRotation(FRotator(Value.Y, 0.f, 0.f));
+	AddControllerYawInput(Value.X);
+	AddControllerPitchInput(-Value.Y);
 }
 
 void APlayerCharacter::Input_Move_Implementation(FVector2D Value)

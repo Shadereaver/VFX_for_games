@@ -2,6 +2,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Inputable.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 void AMainControl::SetupInputComponent()
@@ -33,6 +34,9 @@ void AMainControl::OnPossess(APawn* InPawn)
 			Subsystem->AddMappingContext(IInputable::Execute_GetMappingContext(InPawn), 0);
 		}
 	}
+
+	UGameplayStatics::GetPlayerCameraManager(this, 0)->ViewPitchMax = 90;
+	UGameplayStatics::GetPlayerCameraManager(this, 0)->ViewPitchMin = -90;
 }
 
 void AMainControl::Look(const FInputActionValue& Value)
