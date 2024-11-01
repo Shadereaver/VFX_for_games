@@ -54,9 +54,9 @@ void APlayerCharacter::Input_Ability3_Implementation()
 	SpawnParameters.Instigator = GetInstigator();
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
-	//TObjectPtr<AProjectile> projectile = Cast<AProjectile>(World->SpawnActor(_Ability3Projectile, &_Muzzle->GetComponentTransform(), SpawnParameters));
+	TObjectPtr<AProjectile> projectile = Cast<AProjectile>(World->SpawnActor(_Ability3Projectile, &_Muzzle->GetComponentTransform(), SpawnParameters));
 
-	//projectile->OnHit.AddUniqueDynamic(this, &APlayerCharacter::Handle_OnHit);
+	projectile->OnHit.AddUniqueDynamic(this, &APlayerCharacter::Handle_OnHit);
 }
 
 void APlayerCharacter::Input_JumpPressed_Implementation()
@@ -85,6 +85,5 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Display, TEXT("hi: %s"), *_Camera->GetName());
 }
 

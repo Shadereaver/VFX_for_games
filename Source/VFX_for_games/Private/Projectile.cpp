@@ -31,6 +31,7 @@ void AProjectile::BeginPlay()
 void AProjectile::Handle_Hit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
+	UE_LOG(LogTemp, Display, TEXT("ProjHit"));
 	OnHit.Broadcast(HitComponent, OtherActor, OtherComp, NormalImpulse, Hit);
 	Destroy();
 }
