@@ -3,9 +3,9 @@
 #include "CoreMinimal.h"
 #include "Inputable.h"
 #include "GameFramework/Character.h"
-#include "NiagaraComponent.h"
 #include "PlayerCharacter.generated.h"
 
+class AProjectile;
 class UPositionSwapAbility;
 class USpringArmComponent;
 class UCameraComponent;
@@ -39,5 +39,14 @@ protected:
 	TObjectPtr<USpringArmComponent> _Arm;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UArrowComponent> _Muzzle;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UInputMappingContext> _InputMapping;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AProjectile> _Ability3Projectile;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Handle_OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse, const FHitResult& Hit);
 };
