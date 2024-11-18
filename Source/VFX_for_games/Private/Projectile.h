@@ -4,8 +4,10 @@
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FProjectileHitSignature, UPrimitiveComponent*, HitComponent, AActor*, OtherActor, UPrimitiveComponent*, OtherComp,
-	FVector, NormalImpulse, const FHitResult&, Hit);
+class UNiagaraComponent;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FProjectileHitSignature, UPrimitiveComponent*, HitComponent, AActor*,
+                                              OtherActor, UPrimitiveComponent*, OtherComp,
+                                              FVector, NormalImpulse, const FHitResult&, Hit);
 
 class USphereComponent;
 class UProjectileMovementComponent;
@@ -28,6 +30,8 @@ protected:
 	TObjectPtr<USphereComponent> _Collider;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UProjectileMovementComponent> _ProjMov;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UNiagaraComponent> _Sprite;
 
 	UFUNCTION()
 	void Handle_Hit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,

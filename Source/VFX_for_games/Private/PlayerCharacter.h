@@ -2,11 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "Inputable.h"
+#include "Components/TimelineComponent.h"
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class UNiagaraComponent;
 class AProjectile;
-class UPositionSwapAbility;
 class USpringArmComponent;
 class UCameraComponent;
 
@@ -43,10 +44,41 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UInputMappingContext> _InputMapping;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Ability 3")
 	TSubclassOf<AProjectile> _Ability3Projectile;
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void Handle_OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 3")
+	TObjectPtr<UNiagaraComponent> _Ring;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 3")
+	TObjectPtr<UNiagaraComponent> _Lightning;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 3")
+	TObjectPtr<UNiagaraComponent> _Tether;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 3")
+	FTimerHandle _PassTetherDataTimer;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 3")
+	FTimerHandle _PassRingDataTimer;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 3")
+	FTimerHandle _RingEffectDone;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 3")
+	FTimerHandle _Ability3Cooldown;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 3")
+	bool _bAbility3OnCooldown;
+	
+	UFUNCTION(BlueprintImplementableEvent, Category="Ability 3")
+	void StartSwap(AActor* OtherActor);
+	UFUNCTION(BlueprintCallable, Category="Ability 3")
+	void SwapDone();
+
+	UFUNCTION(Category="Ability 3")
+	void Handle_Ability3ProjectileOnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit);
+	
+	UFUNCTION(Category="Ability 3")
+	void PassTetherData(AActor* OtherActor);
+	UFUNCTION(Category="Ability 3")
+	void PassRingData();
+	UFUNCTION(Category="Ability 3")
+	void Handle_RingEffectDone(UNiagaraComponent* PSystem);
+	UFUNCTION(Category="Ability 3")
+	void Ability3OffCooldown();
 };

@@ -1,5 +1,6 @@
 ﻿#include "Projectile.h"
 
+#include "NiagaraComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
@@ -10,6 +11,9 @@ AProjectile::AProjectile()
 	RootComponent = _Collider;
 	_Collider->SetCollisionProfileName("Projectile");
 	_Collider->OnComponentHit.AddUniqueDynamic(this, &AProjectile::Handle_Hit);
+
+	_Sprite = CreateDefaultSubobject<UNiagaraComponent>(TEXT("_Sprite"));
+	_Sprite->SetupAttachment(RootComponent);
 	
 	_ProjMov = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	_ProjMov->UpdatedComponent = RootComponent;
