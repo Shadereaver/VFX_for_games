@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class APortal;
+class AWall;
+class UHealth;
 class UNiagaraComponent;
 class AProjectile;
 class USpringArmComponent;
@@ -44,9 +47,32 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UInputMappingContext> _InputMapping;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Ability 3")
-	TSubclassOf<AProjectile> _Ability3Projectile;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UHealth> _Health;
 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category="Attack")
+	TSubclassOf<AProjectile> _AttackProjectile;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ability 1")
+	TSubclassOf<AWall> _Wall;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Ability 1")
+	TObjectPtr<USceneComponent> _WallPos;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 1")
+	bool _bAbility1OnCooldown;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 1")
+	FTimerHandle _Ability1Cooldown;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ability 2")
+	TSubclassOf<APortal> _Portal;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 2")
+	FTimerHandle _IncorporealTime;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 2")
+	bool _bAbility2OnCooldown;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 2")
+	FTimerHandle _Ability2Cooldown;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ability 3")
+	TSubclassOf<AProjectile> _Ability3Projectile;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 3")
 	TObjectPtr<UNiagaraComponent> _Ring;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 3")
@@ -63,6 +89,14 @@ protected:
 	FTimerHandle _Ability3Cooldown;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 3")
 	bool _bAbility3OnCooldown;
+
+	UFUNCTION(Category="Ability 1")
+	void Ability1OffCooldown();
+	
+	UFUNCTION(Category="Ability 2")
+	void EndIncorporealTime(APortal* Portal1);
+	UFUNCTION(Category="Ability 2")
+	void Ability2OffCooldown();
 	
 	UFUNCTION(BlueprintImplementableEvent, Category="Ability 3")
 	void StartSwap(AActor* OtherActor);
