@@ -10,9 +10,8 @@ AWall::AWall()
 	PrimaryActorTick.bCanEverTick = false;
 
 	_Collider = CreateDefaultSubobject<UBoxComponent>(TEXT("_Collider"));
-	_Collider->SetBoxExtent(FVector(200, 10, 125));
-	_Collider->OnComponentBeginOverlap.AddUniqueDynamic(this, &AWall::Handle_Overlap);
 	RootComponent = _Collider;
+	_Collider->SetBoxExtent(FVector(200, 10, 125));
 
 	_Wall = CreateDefaultSubobject<UNiagaraComponent>(TEXT("_Wall"));
 	_Wall->SetupAttachment(RootComponent);
@@ -26,5 +25,13 @@ void AWall::Handle_Overlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 	{
 		IDamageMultiply::Execute_MultiplyDamage(OtherActor, 2);
 	}
+}
+
+void AWall::BeginPlay()
+{
+	Super::BeginPlay();
+
+	_Collider->OnComponentBeginOverlap.AddUniqueDynamic(this, &AWall::Handle_Overlap);
+
 }
 

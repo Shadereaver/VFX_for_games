@@ -162,6 +162,7 @@ void APlayerCharacter::EndIncorporealTime(APortal* OtherPortal)
 
 	TObjectPtr<APortal> Portal = Cast<APortal>(GetWorld()->SpawnActor(_Portal, &GetActorTransform(), SpawnParams));
 
+	Portal->_bCanTeleport = false;
 	Portal->_Partner = OtherPortal;
 	OtherPortal->_Partner = Portal;
 
