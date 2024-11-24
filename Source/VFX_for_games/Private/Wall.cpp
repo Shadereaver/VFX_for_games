@@ -3,6 +3,7 @@
 #include "DamageMultiply.h"
 #include "Components/BoxComponent.h"
 #include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 AWall::AWall()
@@ -11,7 +12,6 @@ AWall::AWall()
 
 	_Collider = CreateDefaultSubobject<UBoxComponent>(TEXT("_Collider"));
 	RootComponent = _Collider;
-	_Collider->SetBoxExtent(FVector(200, 10, 125));
 
 	_Wall = CreateDefaultSubobject<UNiagaraComponent>(TEXT("_Wall"));
 	_Wall->SetupAttachment(RootComponent);
@@ -24,6 +24,7 @@ void AWall::Handle_Overlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 	if (UKismetSystemLibrary::DoesImplementInterface(OtherActor, UDamageMultiply::StaticClass()))
 	{
 		IDamageMultiply::Execute_MultiplyDamage(OtherActor, 2);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, _Impact, OtherActor->GetActorLocation(), GetActorRotation());
 	}
 }
 

@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
 
+class UNiagaraSystem;
 class UNiagaraComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FProjectileHitSignature, UPrimitiveComponent*, HitComponent, AActor*,
                                               OtherActor, UPrimitiveComponent*, OtherComp,
@@ -32,6 +33,8 @@ protected:
 	TObjectPtr<UProjectileMovementComponent> _ProjMov;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UNiagaraComponent> _Sprite;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UNiagaraSystem> _Impact;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float _Damage;

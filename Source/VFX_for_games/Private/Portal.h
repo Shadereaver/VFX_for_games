@@ -7,6 +7,8 @@
 class UCapsuleComponent;
 class UNiagaraComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPortalDeathSignature);
+
 UCLASS()
 class VFX_FOR_GAMES_API APortal : public AActor 
 {
@@ -20,6 +22,8 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool _bCanTeleport;
+
+	FPortalDeathSignature OnDeath;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

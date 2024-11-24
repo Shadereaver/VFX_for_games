@@ -41,6 +41,8 @@ protected:
 	TObjectPtr<UCameraComponent> _Camera;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<USpringArmComponent> _Arm;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TObjectPtr<UStaticMeshComponent> _Mesh;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UArrowComponent> _Muzzle;
@@ -70,7 +72,21 @@ protected:
 	bool _bAbility2OnCooldown;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 2")
 	FTimerHandle _Ability2Cooldown;
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,  Category="Ability 2")
+	TObjectPtr<UMaterialInterface> _DefaultMaterial;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,  Category="Ability 2")
+	TObjectPtr<UMaterialInterface> _IncorporealMaterial;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 2")
+	TObjectPtr<UNiagaraComponent> _PortalLink;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 2")
+	TArray<FVector> _Points;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 2")
+	FTimerHandle _SetPointTimer;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 2")
+	TObjectPtr<APortal> _Portal1Ref;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 2")
+	TObjectPtr<APortal> _Portal2Ref;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ability 3")
 	TSubclassOf<AProjectile> _Ability3Projectile;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ability 3")
@@ -94,9 +110,13 @@ protected:
 	void Ability1OffCooldown();
 	
 	UFUNCTION(Category="Ability 2")
-	void EndIncorporealTime(APortal* Portal1);
+	void EndIncorporealTime();
 	UFUNCTION(Category="Ability 2")
 	void Ability2OffCooldown();
+	UFUNCTION(Category="Ability 2")
+	void SetPoints(int ID = 0);
+	UFUNCTION(Category="Ability 2")
+	void Handle_PortalDeath();
 	
 	UFUNCTION(BlueprintImplementableEvent, Category="Ability 3")
 	void StartSwap(AActor* OtherActor);

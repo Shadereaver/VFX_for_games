@@ -38,7 +38,11 @@ void APortal::Handle_EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 void APortal::DecrementUses()
 {
 	_Uses--;
-	if (_Uses == 0) {Destroy();}
+	if (_Uses == 0)
+	{
+		OnDeath.Broadcast();
+		Destroy();
+	}
 }
 
 void APortal::BeginPlay()

@@ -1,6 +1,7 @@
 ﻿#include "Projectile.h"
 
 #include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -36,6 +37,7 @@ void AProjectile::MultiplyDamage_Implementation(float Multiplier)
 void AProjectile::Handle_Hit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                              FVector NormalImpulse, const FHitResult& Hit)
 {
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, _Impact, GetActorLocation());
 	UGameplayStatics::ApplyDamage(OtherActor, _Damage, GetInstigatorController(), this, UDamageType::StaticClass());
 	OnHit.Broadcast(HitComponent, OtherActor, OtherComp, NormalImpulse, Hit);
 	Destroy();

@@ -2,6 +2,7 @@
 
 #include "Health.h"
 #include "NiagaraComponent.h"
+#include "NiagaraDataInterfaceArrayFunctionLibrary.h"
 #include "Portal.h"
 #include "Projectile.h"
 #include "Wall.h"
@@ -19,6 +20,9 @@ APlayerCharacter::APlayerCharacter()
 	_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	_Camera->SetupAttachment(_Arm, FName("SpringEndpoint"));
 
+	_Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("_Mesh"));
+	_Mesh->SetupAttachment(RootComponent);
+	
 	_Muzzle = CreateDefaultSubobject<UArrowComponent>(TEXT("Muzzle"));
 	_Muzzle->SetupAttachment(RootComponent);
 
@@ -31,6 +35,9 @@ APlayerCharacter::APlayerCharacter()
 	_Tether = CreateDefaultSubobject<UNiagaraComponent>(TEXT("_Tether"));
 	_Tether->SetupAttachment(RootComponent);
 
+	_PortalLink = CreateDefaultSubobject<UNiagaraComponent>(TEXT("_PortalLink"));
+	_PortalLink->SetupAttachment(RootComponent);
+
 	_Health = CreateDefaultSubobject<UHealth>(TEXT("_Health"));
 
 	_WallPos = CreateDefaultSubobject<USceneComponent>(TEXT("_WallPos"));
@@ -39,6 +46,8 @@ APlayerCharacter::APlayerCharacter()
 	_bAbility3OnCooldown = false;
 	_bAbility2OnCooldown = false;
 	_bAbility1OnCooldown = false;
+
+	_Points.Init(FVector(0), 6);
 }
 
 UInputMappingContext* APlayerCharacter::GetMappingContext_Implementation()
@@ -81,11 +90,23 @@ void APlayerCharacter::Input_Ability2_Implementation()
 {
 	if (_bAbility2OnCooldown) {return;}
 	_bAbility2OnCooldown = true;
+
+	if (_Portal1Ref != nullptr)
+	{
+		_Portal1Ref->OnDeath.Broadcast();
+		_Portal1Ref->Destroy();
+		_Portal2Ref->Destroy();
+	}
+
+	_Camera->PostProcessSettings.WeightedBlendables.Array.GetData()->Weight = 1;
+	
 	GetWorldTimerManager().SetTimer(_Ability2Cooldown, this, &APlayerCharacter::Ability2OffCooldown, 30);
 	
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
+
+	_Mesh->SetMaterial(0, _IncorporealMaterial);
 	
 	FActorSpawnParameters SpawnParams;
 
@@ -93,11 +114,13 @@ void APlayerCharacter::Input_Ability2_Implementation()
 	SpawnParams.Instigator = GetInstigator();
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
-	TObjectPtr<APortal> Portal = Cast<APortal>(GetWorld()->SpawnActor(_Portal, &GetActorTransform(), SpawnParams));
+	_Portal1Ref = Cast<APortal>(GetWorld()->SpawnActor(_Portal, &GetActorTransform(), SpawnParams));
 
-	FTimerDelegate Timerdel;
-	Timerdel.BindUFunction(this, FName("EndIncorporealTime"), Portal);
-	GetWorldTimerManager().SetTimer(_IncorporealTime, Timerdel, 5, false);
+	_Portal1Ref->OnDeath.AddUniqueDynamic(this, &APlayerCharacter::Handle_PortalDeath);
+	
+	GetWorldTimerManager().SetTimer(_IncorporealTime, this, &APlayerCharacter::EndIncorporealTime, 5.1, false);
+
+	SetPoints();
 }
 
 void APlayerCharacter::Input_Ability3_Implementation()
@@ -144,6 +167,8 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	_DefaultMaterial = _Mesh->GetMaterial(0);
+
 	_Ring->OnSystemFinished.AddUniqueDynamic(this, &APlayerCharacter::Handle_RingEffectDone);
 }
 
@@ -152,7 +177,7 @@ void APlayerCharacter::Ability1OffCooldown()
 	_bAbility1OnCooldown = false;
 }
 
-void APlayerCharacter::EndIncorporealTime(APortal* OtherPortal)
+void APlayerCharacter::EndIncorporealTime()
 {
 	FActorSpawnParameters SpawnParams;
 
@@ -160,20 +185,47 @@ void APlayerCharacter::EndIncorporealTime(APortal* OtherPortal)
 	SpawnParams.Instigator = GetInstigator();
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
-	TObjectPtr<APortal> Portal = Cast<APortal>(GetWorld()->SpawnActor(_Portal, &GetActorTransform(), SpawnParams));
+	_Portal2Ref = Cast<APortal>(GetWorld()->SpawnActor(_Portal, &GetActorTransform(), SpawnParams));
 
-	Portal->_bCanTeleport = false;
-	Portal->_Partner = OtherPortal;
-	OtherPortal->_Partner = Portal;
+	_Portal2Ref->_bCanTeleport = false;
+	_Portal2Ref->_Partner = _Portal1Ref;
+	_Portal1Ref->_Partner = _Portal2Ref;
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Block);
+
+	_Mesh->SetMaterial(0, _DefaultMaterial);
+
+	_Camera->PostProcessSettings.WeightedBlendables.Array.GetData()->Weight = 0;
 }
 
 void APlayerCharacter::Ability2OffCooldown()
 {
 	_bAbility2OnCooldown = false;
+}
+
+void APlayerCharacter::SetPoints(int ID)
+{
+	_Points[ID] = GetActorLocation();
+	ID++;
+	
+	if (ID == 6)
+	{
+		ID = 0;
+		UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayPosition(_PortalLink, FName("Points"), _Points);
+		_PortalLink->ToggleActive();
+		return;
+	}
+	
+	FTimerDelegate TimerDel;
+	TimerDel.BindUFunction(this, FName("SetPoints"), ID);
+	GetWorldTimerManager().SetTimer(_SetPointTimer, TimerDel, 1, false);
+}
+
+void APlayerCharacter::Handle_PortalDeath()
+{
+	_PortalLink->ToggleActive();
 }
 
 void APlayerCharacter::SwapDone()
