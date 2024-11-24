@@ -99,6 +99,8 @@ void APlayerCharacter::Input_Ability2_Implementation()
 	}
 
 	_Camera->PostProcessSettings.WeightedBlendables.Array.GetData()->Weight = 1;
+	_Camera->PostProcessSettings.SceneFringeIntensity = 10;
+
 	
 	GetWorldTimerManager().SetTimer(_Ability2Cooldown, this, &APlayerCharacter::Ability2OffCooldown, 30);
 	
@@ -117,6 +119,7 @@ void APlayerCharacter::Input_Ability2_Implementation()
 	_Portal1Ref = Cast<APortal>(GetWorld()->SpawnActor(_Portal, &GetActorTransform(), SpawnParams));
 
 	_Portal1Ref->OnDeath.AddUniqueDynamic(this, &APlayerCharacter::Handle_PortalDeath);
+	_Portal1Ref->_bCanTeleport = true;
 	
 	GetWorldTimerManager().SetTimer(_IncorporealTime, this, &APlayerCharacter::EndIncorporealTime, 5.1, false);
 
@@ -198,6 +201,7 @@ void APlayerCharacter::EndIncorporealTime()
 	_Mesh->SetMaterial(0, _DefaultMaterial);
 
 	_Camera->PostProcessSettings.WeightedBlendables.Array.GetData()->Weight = 0;
+	_Camera->PostProcessSettings.SceneFringeIntensity = 0;
 }
 
 void APlayerCharacter::Ability2OffCooldown()
